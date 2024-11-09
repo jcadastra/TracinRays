@@ -98,18 +98,28 @@ class Sphere:
         # TODO A4 implement this function
         a = np.dot(ray.direction, ray.direction)
         b = 2*np.dot(ray.origin - self.center, ray.direction)
-        c = np.dot(ray.origin - self.center, ray.origin - self.center) - self.radius*self.radius
-        if b**2 - 4*a*c < 0:
+        c = np.dot(ray.origin - self.center, ray.origin - self.center) - self.radius**2
+        if (b**2 - 4*a*c) < 0:
             return no_hit
         t1 = (-b+np.sqrt(b**2 - 4*a*c))/(2*a)
         t2 = (-b-np.sqrt(b**2 - 4*a*c))/(2*a)
-        normal = normalize(ray.origin + ray.direction*t1 - self.center)
+
         if t1 < t2:
             if ray.start <= t1 <= ray.end:
+                normal = normalize(ray.origin + ray.direction*t1 - self.center)
                 return Hit(t1, ray.origin + ray.direction*t1, normal, self.material)
+            else:
+                if ray.start <= t2 <= ray.end:
+                    normal = normalize(ray.origin + ray.direction*t2 - self.center)
+                    return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
         else:
             if ray.start <= t2 <= ray.end:
+                normal = normalize(ray.origin + ray.direction * t1 - self.center)
                 return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
+            else:
+                if ray.start <= t1 <= ray.end:
+                    normal = normalize(ray.origin + ray.direction * t1 - self.center)
+                    return Hit(t1, ray.origin + ray.direction * t1, normal, self.material)
         return no_hit
 
 
@@ -295,6 +305,6 @@ def render_image(camera, scene, lights, nx, ny):
             if intersection is not no_hit:
                 output_image[i, j] = vec([1.0, 1.0, 1.0])
             else:
-                output_image[i, j] = vec([1.0, 1.0, 1.0])
+                output_image[i, j] = vec([0.0, 0.0, 0.0])
 
     return output_image

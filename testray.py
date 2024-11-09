@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
-# from ray import *
-from rayStaff import *
+from ray import *
+#from rayStaff import *
 from utils import normalize, vec
 
 def assert_direction_matches(v, w):
