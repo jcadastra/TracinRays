@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 from ray import *
-#from rayStaff import *
 from utils import normalize, vec
 
 def assert_direction_matches(v, w):
@@ -68,11 +67,11 @@ class TestCamera(unittest.TestCase):
         assert_direction_matches(ray.direction, vec([0,0,-1]))
         # FOV is 90 degrees, so corner rays are centered in octants
         ray = cam.generate_ray(flipy_vec([0, 0]))
-        assert_direction_matches(ray.direction, vec([-1,1,-1]))
+        assert_direction_matches(ray.direction, vec([-1,-1,-1]))
         ray = cam.generate_ray(flipy_vec([1, 0]))
-        assert_direction_matches(ray.direction, vec([ 1,1,-1]))
+        assert_direction_matches(ray.direction, vec([ 1,-1,-1]))
         ray = cam.generate_ray(flipy_vec([0, 1]))
-        assert_direction_matches(ray.direction, vec([-1, -1,-1]))
+        assert_direction_matches(ray.direction, vec([-1, 1,-1]))
 
     def test_fov(self):
         # A camera with a different fov: rays should be scaled in x and y
@@ -102,9 +101,9 @@ class TestCamera(unittest.TestCase):
         assert_direction_matches(ray.direction, vec([0,1,0]))
         # corners are like default camera but (x,y) is (x, z)
         ray = cam.generate_ray(flipy_vec([0, 0]))
-        assert_direction_matches(ray.direction, vec([-1, 1,1]))
+        assert_direction_matches(ray.direction, vec([-1, 1,-1]))
         ray = cam.generate_ray(flipy_vec([1, 0]))
-        assert_direction_matches(ray.direction, vec([ 1, 1,1]))
+        assert_direction_matches(ray.direction, vec([ 1, 1,-1]))
 
     def test_arbitrary_frame(self):
         # A camera that lines up with nothing in particular
