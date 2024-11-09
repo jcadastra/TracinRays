@@ -99,6 +99,8 @@ class Sphere:
         a = np.dot(ray.direction, ray.direction)
         b = 2*np.dot(ray.origin - self.center, ray.direction)
         c = np.dot(ray.origin - self.center, ray.origin - self.center) - self.radius*self.radius
+        if b**2 - 4*a*c < 0:
+            return no_hit
         t1 = (-b+np.sqrt(b**2 - 4*a*c))/(2*a)
         t2 = (-b-np.sqrt(b**2 - 4*a*c))/(2*a)
         normal = normalize(ray.origin + ray.direction*t1 - self.center)
@@ -132,7 +134,13 @@ class Triangle:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        
+        A = np.matrix(self.vs[0] - self.vs[1], self.vs[0] - self.vs[2], ray.direction)
+        b = np.matrix(self.vs[0] - ray.origin)
+        x = np.linalg.solve(A, b)
+        if x[0] > 0 and x[1] > 0 and (x[0] + x[1]) < 1:
+            if ray.start <= x[2] <= ray.end:
+                normal = normalize(np.cross(self.vs[0] - self.vs[1], self.vs[0] - self.vs[2]))
+                return Hit(x[2], ray.origin + ray.direction*x[2], normal, self.material)
         return no_hit
 
 
@@ -154,6 +162,9 @@ class Camera:
         self.f = None; # you should set this to the distance from your center of projection to the image plane
         self.M = np.eye(4);  # set this to the matrix that transforms your camera's coordinate system to world coordinates
         # TODO A4 implement this constructor to store whatever you need for ray generation
+        self.target = target
+        self.up = up
+        self.vfov = vfov
 
     def generate_ray(self, img_point):
         """Compute the ray corresponding to a point in the image.
@@ -165,7 +176,7 @@ class Camera:
           Ray -- The ray corresponding to that image location (not necessarily normalized)
         """
         # TODO A4 implement this function
-        return Ray(vec([0,0,0]), vec([0,0,1]))
+        return Ray(vec([img_point[0],img_point[1],0]), self.target)
 
 
 class PointLight:
@@ -239,7 +250,7 @@ class Scene:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        return no_hit
+        return self.surfs[0].intersect(ray)
 
 
 MAX_DEPTH = 4
@@ -274,4 +285,16 @@ def render_image(camera, scene, lights, nx, ny):
       (ny, nx, 3) float32 -- the RGB image
     """
     # TODO A4 implement this function
-    return np.zeros((ny,nx,3), np.float32)
+    output_image = np.zeros((ny, nx, 3), np.float32)
+    for i in range(ny):
+        for j in range(nx):
+            ray = camera.generate_ray(vec([i, j])) # Generate Ray---we recommend just generating an orthographic ray to start with
+            intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
+
+            # set the output pixel color if an intersection is found
+            if intersection is not no_hit:
+                output_image[i, j] = vec([1.0, 1.0, 1.0])
+            else:
+                output_image[i, j] = vec([1.0, 1.0, 1.0])
+
+    return output_image
