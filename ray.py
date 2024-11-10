@@ -214,12 +214,9 @@ class PointLight:
         # TODO A4 implement this function
         hit_point = hit.point
         normal = hit.normal
-        material = hit.material  # Material properties, such as color and reflectivity
+        material = hit.material
 
-        # Direction from hit point to light
-        light_direction = self.position - hit_point
-        light_distance = np.sum(light_direction)
-        light_direction = light_direction/light_distance # Normalize the light direction
+        light_direction = normalize(self.position - hit_point)
 
         ray_length = ray.end - ray.start
         v = -ray.direction/np.sum(ray_length)
@@ -227,20 +224,16 @@ class PointLight:
         h = (v+light_direction)/np.sum(v+light_direction)
         specular = material.k_s*(np.dot(normal, h))**material.p
 
-        # Compute the diffuse component (Lambertian shading)
         irradiance = max(np.dot(normal, light_direction), 0.0)
 
         shading_contribution = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
 
-        # Cast a shadow ray to see if the point is in shadow
-        shadow_ray = Ray(hit_point + normal * 0.001, light_direction)  # A small offset to avoid self-intersection
+        shadow_ray = Ray(hit_point + normal * 0.001, light_direction)
 
-        if not scene.intersect(shadow_ray):  # Check if any object blocks the light
+        if not scene.intersect(shadow_ray):
             return shading_contribution
         else:
-            return vec([0,0,0])  # Return black (no light) if in shadow
-
-        # Calculate the diffuse color contribution
+            return vec([0,0,0])
 
 
 
@@ -296,10 +289,8 @@ class Scene:
         closest_t = np.inf
 
         for surf in self.surfs:
-            # Intersect the ray with the surface (Sphere or Triangle)
             hit = surf.intersect(ray)
 
-            # If the hit is valid and closer than the previous closest, update the closest hit
             if hit and hit.t < closest_t:
                 closest_hit = hit
                 closest_t = hit.t
@@ -343,7 +334,8 @@ def render_image(camera, scene, lights, nx, ny):
     output_image = np.zeros((ny, nx, 3), np.float32)
     for i in range(ny):
         for j in range(nx):
-            ray = camera.generate_ray(vec([i, j])) # Generate Ray---we recommend just generating an orthographic ray to start with
+            #ray = camera.generate_ray(vec([i, j])) # Generate Ray---we recommend just generating an orthographic ray to start with
+            ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
             intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
 
             # set the output pixel color if an intersection is found
