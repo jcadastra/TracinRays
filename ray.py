@@ -4,13 +4,13 @@ from utils import *
 
 """
 Core implementation of the ray tracer.  This module contains the classes (Sphere, Mesh, etc.)
-that define the contents of scenes, as well as classes (Ray, Hit) and functions (shade) used in 
+that define the contents of scenes, as well as classes (Ray, Hit) and functions (shade) used in
 the rendering algorithm, and the main entry point `render_image`.
 
 In the documentation of these classes, we indicate the expected types of arguments with a
 colon, and use the convention that just writing a tuple means that the expected type is a
 NumPy array of that shape.  Implementations can assume these types are preconditions that
-are met, and if they fail for other type inputs it's an error of the caller.  (This might 
+are met, and if they fail for other type inputs it's an error of the caller.  (This might
 not be the best way to handle such validation in industrial-strength code but we are adopting
 this rule to keep things simple and efficient.)
 """
@@ -156,7 +156,7 @@ class Triangle:
 
 class Camera:
 
-    def __init__(self, eye=vec([0,0,0]), target=vec([0,0,-1]), up=vec([0,1,0]), 
+    def __init__(self, eye=vec([0,0,0]), target=vec([0,0,-1]), up=vec([0,1,0]),
                  vfov=90.0, aspect=1.0):
         """Create a camera with given viewing parameters.
 
@@ -212,7 +212,38 @@ class PointLight:
           (3,) -- the light reflected from the surface
         """
         # TODO A4 implement this function
-        return vec([0,0,0])
+        hit_point = hit.point
+        normal = hit.normal
+        material = hit.material  # Material properties, such as color and reflectivity
+
+        # Direction from hit point to light
+        light_direction = self.position - hit_point
+        light_distance = np.sum(light_direction)
+        light_direction = light_direction/light_distance # Normalize the light direction
+
+        ray_length = ray.end - ray.start
+        v = -ray.direction/np.sum(ray_length)
+
+        h = (v+light_direction)/np.sum(v+light_direction)
+        specular = material.k_s*(np.dot(normal, h))**material.p
+
+        # Compute the diffuse component (Lambertian shading)
+        irradiance = max(np.dot(normal, light_direction), 0.0)
+
+        shading_contribution = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
+
+        # Cast a shadow ray to see if the point is in shadow
+        shadow_ray = Ray(hit_point + normal * 0.001, light_direction)  # A small offset to avoid self-intersection
+
+        if not scene.intersect(shadow_ray):  # Check if any object blocks the light
+            return shading_contribution
+        else:
+            return vec([0,0,0])  # Return black (no light) if in shadow
+
+        # Calculate the diffuse color contribution
+
+
+
 
 
 class AmbientLight:
@@ -236,7 +267,8 @@ class AmbientLight:
           (3,) -- the light reflected from the surface
         """
         # TODO A4 implement this function
-        return vec([0,0,0])
+
+        return self.intensity * hit.material.k_a
 
 
 class Scene:
@@ -260,7 +292,20 @@ class Scene:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        return self.surfs[0].intersect(ray)
+        closest_hit = None
+        closest_t = np.inf
+
+        for surf in self.surfs:
+            # Intersect the ray with the surface (Sphere or Triangle)
+            hit = surf.intersect(ray)
+
+            # If the hit is valid and closer than the previous closest, update the closest hit
+            if hit and hit.t < closest_t:
+                closest_hit = hit
+                closest_t = hit.t
+
+        return closest_hit
+        # return self.surfs[0].intersect(ray)
 
 
 MAX_DEPTH = 4
