@@ -114,7 +114,7 @@ class Sphere:
                     return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
         else:
             if ray.start <= t2 <= ray.end:
-                normal = normalize(ray.origin + ray.direction * t1 - self.center)
+                normal = normalize(ray.origin + ray.direction * t2 - self.center)
                 return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
             else:
                 if ray.start <= t1 <= ray.end:
