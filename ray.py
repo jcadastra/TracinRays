@@ -330,7 +330,9 @@ def shade(ray, hit, scene, lights, depth=0):
     of MAX_DEPTH, with zero contribution beyond that depth.
     """
     # TODO A4 implement this function
-    return vec([0,0,0])
+    if hit is no_hit:
+        return scene.bg_color
+    return hit.material.k_d
 
 
 def render_image(camera, scene, lights, nx, ny):
@@ -352,12 +354,13 @@ def render_image(camera, scene, lights, nx, ny):
             #y = (i + 0.5) / ny
             ray = camera.generate_ray(vec([i/ny, j/nx])) # Generate Ray---we recommend just generating an orthographic ray to start with
             #ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
-            intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
+            intersection = scene.intersect(ray)  # this will return a Hit object
 
+            output_image[i, j] = shade(ray, intersection, scene, lights)
             # set the output pixel color if an intersection is found
-            if intersection is not no_hit:
-                output_image[i, j] = vec([1.0, 1.0, 1.0])
-            else:
-                output_image[i, j] = vec([0.0, 0.0, 0.0])
+            #if intersection is not no_hit:
+            #    output_image[i, j] = vec([1.0, 1.0, 1.0])
+            #else:
+            #    output_image[i, j] = vec([0.0, 0.0, 0.0])
 
     return output_image
