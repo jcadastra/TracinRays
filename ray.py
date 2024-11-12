@@ -343,8 +343,8 @@ def render_image(camera, scene, lights, nx, ny):
     output_image = np.zeros((ny, nx, 3), np.float32)
     for i in range(ny):
         for j in range(nx):
-            #ray = camera.generate_ray(vec([i, j])) # Generate Ray---we recommend just generating an orthographic ray to start with
-            ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
+            ray = camera.generate_ray(vec([i/ny, j/nx])) # Generate Ray---we recommend just generating an orthographic ray to start with
+            #ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
             intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
 
             # set the output pixel color if an intersection is found
