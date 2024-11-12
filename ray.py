@@ -235,21 +235,20 @@ class PointLight:
         specular = material.k_s*(np.dot(normal, h))**material.p
 
         irradiance = max(np.dot(normal, light_direction), 0.0)
+        lambertian_shading = irradiance/(light_distance**2) * self.intensity * material.k_d
+        specular_light = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
 
-        shading_contribution = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
+        r = 2 * np.dot(normal,v) * normal - v
+        # Ray(hit_point, r)
+        # mirror = material.k_m *
 
         shadow_ray = Ray(hit_point + normal * 0.001, light_direction)
 
 
-        if scene.intersect(shadow_ray) is scene.bg_color:
-            return shading_contribution
+        if scene.intersect(shadow_ray) is no_hit:
+            return lambertian_shading+specular_light
         else:
             return vec([0,0,0])
-
-
-
-
-
 
 
 class AmbientLight:
@@ -298,7 +297,7 @@ class Scene:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        closest_hit = self.bg_color
+        closest_hit = no_hit
         closest_t = np.inf
 
         for surf in self.surfs:
