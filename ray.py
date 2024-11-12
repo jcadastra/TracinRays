@@ -144,10 +144,10 @@ class Triangle:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        print(self.vs[0] - self.vs[1])
+        #print(self.vs[0] - self.vs[1])
 
-        print(self.vs[0] - self.vs[2])
-        print(ray.direction)
+        #print(self.vs[0] - self.vs[2])
+        #print(ray.direction)
         A = np.concatenate(([self.vs[0] - self.vs[1]], [self.vs[0] - self.vs[2]], [ray.direction]), axis=0)
         b = self.vs[0] - ray.origin
         x = np.linalg.solve(A.T, b)
