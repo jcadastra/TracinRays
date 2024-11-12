@@ -328,7 +328,11 @@ def shade(ray, hit, scene, lights, depth=0):
     # TODO A4 implement this function
     if hit is no_hit:
         return scene.bg_color
-    return hit.material.k_d
+
+    sum = vec([0,0,0])
+    for light in lights:
+        sum += light.illuminate(ray, hit, scene)
+    return sum
 
 
 def render_image(camera, scene, lights, nx, ny):
