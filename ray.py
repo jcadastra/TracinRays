@@ -194,7 +194,7 @@ class Camera:
         x = img_point[0] * 2 - 1
         y = img_point[1] * 2 - 1
 
-        d = normalize(self.u * (x * self.width/2) + self.v * (y * self.height/2) + self.w * self.f)
+        d = normalize(self.u * (x * self.height/2) + self.v * (y * self.width/2) + self.w * self.f)
         return Ray(self.eye, d)
 
 
@@ -343,6 +343,8 @@ def render_image(camera, scene, lights, nx, ny):
     output_image = np.zeros((ny, nx, 3), np.float32)
     for i in range(ny):
         for j in range(nx):
+            #x = (j + 0.5) / nx
+            #y = (i + 0.5) / ny
             ray = camera.generate_ray(vec([i/ny, j/nx])) # Generate Ray---we recommend just generating an orthographic ray to start with
             #ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
             intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
