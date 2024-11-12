@@ -224,27 +224,26 @@ class PointLight:
         n = hit.normal
         material = hit.material
 
-        light_distance = np.linalg.norm(self.position - hit.point)
-        light_direction = normalize(self.position - hit.point)
+        r = np.linalg.norm(self.position - hit.point)
+        l = normalize(self.position - hit.point)
 
-        irradiance = max(np.dot(n, light_direction), 0.0)
-        lambertian_shading = material.k_d * irradiance/(light_distance**2) * self.intensity
+        irradiance = max(np.dot(n, l), 0.0)
+        # lambertian_shading = material.k_d * irradiance/(r**2) * self.intensity
 
-        # ray_length = ray.end - ray.start
-        # v = -ray.direction/np.sum(ray_length)
-        # h = (v+light_direction)/np.sum(v+light_direction)
-        # specular = material.k_s*(np.dot(normal, h))**material.p
-        # specular_light = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
+        v = -ray.direction/np.linalg.norm(ray.end - ray.start)
+        h = (v+l)/np.linalg.norm(v+l)
+        specular = material.k_s*(np.dot(n, h))**material.p
+        specular_light = (material.k_d + specular)*irradiance/(r**2) * self.intensity
 
         # r = 2 * np.dot(normal,v) * normal - v
         # Ray(hit_point, r)
         # mirror = material.k_m *
 
-        shadow_ray = Ray(hit.point + n * 0.001, light_direction)
+        shadow_ray = Ray(hit.point + n * 0.001, l)
 
 
         if scene.intersect(shadow_ray) is no_hit:
-            return lambertian_shading
+            return specular_light
         else:
             return vec([0,0,0])
 
