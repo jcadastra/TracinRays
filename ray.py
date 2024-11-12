@@ -169,12 +169,17 @@ class Camera:
         """
         self.eye = eye
         self.aspect = aspect
-        self.f = None; # you should set this to the distance from your center of projection to the image plane
+        self.f = np.linalg.norm(target-eye); # you should set this to the distance from your center of projection to the image plane
         self.M = np.eye(4);  # set this to the matrix that transforms your camera's coordinate system to world coordinates
         # TODO A4 implement this constructor to store whatever you need for ray generation
         self.target = target
         self.up = up
         self.vfov = vfov
+        self.height = 2*self.f*np.tan(np.radians(vfov)/2)
+        self.width = aspect*self.height
+        self.w = (self.target - self.eye)/self.f # away from viewing direction
+        self.u = np.cross(self.w, self.up) # right
+        self.v = np.cross(self.w, self.u) # up
 
     def generate_ray(self, img_point):
         """Compute the ray corresponding to a point in the image.
@@ -186,7 +191,11 @@ class Camera:
           Ray -- The ray corresponding to that image location (not necessarily normalized)
         """
         # TODO A4 implement this function
-        return Ray(vec([img_point[0],img_point[1],0]), self.target)
+        x = img_point[0] * 2 - 1
+        y = img_point[1] * 2 - 1
+
+        d = normalize(self.u * (x * self.width/2) + self.v * (y * self.height/2) + self.w * self.f)
+        return Ray(self.eye, d)
 
 
 class PointLight:
