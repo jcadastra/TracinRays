@@ -144,9 +144,13 @@ class Triangle:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        A = np.matrix(self.vs[0] - self.vs[1], self.vs[0] - self.vs[2], ray.direction)
-        b = np.matrix(self.vs[0] - ray.origin)
-        x = np.linalg.solve(A, b)
+        print(self.vs[0] - self.vs[1])
+
+        print(self.vs[0] - self.vs[2])
+        print(ray.direction)
+        A = np.concatenate(([self.vs[0] - self.vs[1]], [self.vs[0] - self.vs[2]], [ray.direction]), axis=0)
+        b = self.vs[0] - ray.origin
+        x = np.linalg.solve(A.T, b)
         if x[0] > 0 and x[1] > 0 and (x[0] + x[1]) < 1:
             if ray.start <= x[2] <= ray.end:
                 normal = normalize(np.cross(self.vs[0] - self.vs[1], self.vs[0] - self.vs[2]))
