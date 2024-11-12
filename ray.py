@@ -221,32 +221,30 @@ class PointLight:
           (3,) -- the light reflected from the surface
         """
         # TODO A4 implement this function
-        hit_point = hit.point
-        normal = hit.normal
+        n = hit.normal
         material = hit.material
 
-        light_distance = np.sum(self.position - hit_point)
-        light_direction = normalize(self.position - hit_point)
+        light_distance = np.linalg.norm(self.position - hit.point)
+        light_direction = normalize(self.position - hit.point)
 
-        ray_length = ray.end - ray.start
-        v = -ray.direction/np.sum(ray_length)
+        irradiance = max(np.dot(n, light_direction), 0.0)
+        lambertian_shading = material.k_d * irradiance/(light_distance**2) * self.intensity
 
-        h = (v+light_direction)/np.sum(v+light_direction)
-        specular = material.k_s*(np.dot(normal, h))**material.p
+        # ray_length = ray.end - ray.start
+        # v = -ray.direction/np.sum(ray_length)
+        # h = (v+light_direction)/np.sum(v+light_direction)
+        # specular = material.k_s*(np.dot(normal, h))**material.p
+        # specular_light = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
 
-        irradiance = max(np.dot(normal, light_direction), 0.0)
-        lambertian_shading = irradiance/(light_distance**2) * self.intensity * material.k_d
-        specular_light = irradiance/(light_distance**2) * self.intensity * (material.k_d + specular)
-
-        r = 2 * np.dot(normal,v) * normal - v
+        # r = 2 * np.dot(normal,v) * normal - v
         # Ray(hit_point, r)
         # mirror = material.k_m *
 
-        shadow_ray = Ray(hit_point + normal * 0.001, light_direction)
+        shadow_ray = Ray(hit.point + n * 0.001, light_direction)
 
 
         if scene.intersect(shadow_ray) is no_hit:
-            return lambertian_shading+specular_light
+            return lambertian_shading
         else:
             return vec([0,0,0])
 
