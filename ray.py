@@ -194,7 +194,7 @@ class Camera:
         x = img_point[0] * 2 - 1
         y = img_point[1] * 2 - 1
 
-        d = normalize(self.u * (x * self.height/2) + self.v * (y * self.width/2) + self.w * self.f)
+        d = normalize(self.u * (x * self.width/2) + self.v * (y * self.height/2) + self.w * self.f)
         return Ray(self.eye, d)
 
 
