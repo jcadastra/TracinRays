@@ -225,6 +225,7 @@ class PointLight:
         normal = hit.normal
         material = hit.material
 
+        light_distance = np.sum(self.position - hit_point)
         light_direction = normalize(self.position - hit_point)
 
         ray_length = ray.end - ray.start
@@ -239,10 +240,13 @@ class PointLight:
 
         shadow_ray = Ray(hit_point + normal * 0.001, light_direction)
 
-        if not scene.intersect(shadow_ray):
+
+        if scene.intersect(shadow_ray) is scene.bg_color:
             return shading_contribution
         else:
             return vec([0,0,0])
+
+
 
 
 
@@ -294,7 +298,7 @@ class Scene:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        closest_hit = None
+        closest_hit = self.bg_color
         closest_t = np.inf
 
         for surf in self.surfs:
@@ -305,6 +309,7 @@ class Scene:
                 closest_t = hit.t
 
         return closest_hit
+
         # return self.surfs[0].intersect(ray)
 
 
