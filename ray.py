@@ -144,10 +144,10 @@ class Triangle:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        #print(self.vs[0] - self.vs[1])
-
-        #print(self.vs[0] - self.vs[2])
-        #print(ray.direction)
+        # print(self.vs[0] - self.vs[1])
+        #
+        # print(self.vs[0] - self.vs[2])
+        # print(ray.direction)
         A = np.concatenate(([self.vs[0] - self.vs[1]], [self.vs[0] - self.vs[2]], [ray.direction]), axis=0)
         b = self.vs[0] - ray.origin
         x = np.linalg.solve(A.T, b)
@@ -234,16 +234,12 @@ class PointLight:
         irradiance = max(np.dot(n, l), 0.0)
         # lambertian_shading = material.k_d * irradiance/(r**2) * self.intensity
 
-        v = -ray.direction/np.linalg.norm(ray.end - ray.start)
-        h = (v+l)/np.linalg.norm(v+l)
+        v = -normalize(ray.direction)
+        h = normalize(v+l)
         specular = material.k_s*(np.dot(n, h))**material.p
         specular_light = (material.k_d + specular)*irradiance/(r**2) * self.intensity
 
-        # r = 2 * np.dot(normal,v) * normal - v
-        # Ray(hit_point, r)
-        # mirror = material.k_m *
-
-        shadow_ray = Ray(hit.point + n * 0.001, l)
+        shadow_ray = Ray(hit.point + n * 0.05, l)
 
 
         if scene.intersect(shadow_ray) is no_hit:
@@ -333,10 +329,22 @@ def shade(ray, hit, scene, lights, depth=0):
     if hit is no_hit:
         return scene.bg_color
 
-    sum = vec([0,0,0])
+
+    if depth > MAX_DEPTH:
+        mirror = scene.bg_color
+    else:
+        n = hit.normal
+        v = -normalize(ray.direction)
+        r = 2 * np.dot(n,v) * n - v
+        reflected = Ray(hit.point, r)
+        mirror = hit.material.k_m * shade(reflected, hit, scene, lights, depth+1)
+
+
+    direct = vec([0,0,0])
     for light in lights:
-        sum += light.illuminate(ray, hit, scene)
-    return sum
+        direct += light.illuminate(ray, hit, scene)
+
+    return direct + mirror
 
 
 def render_image(camera, scene, lights, nx, ny):
