@@ -148,7 +148,7 @@ class Triangle:
         # TODO A4 implement this function
         ab = self.vs[0] - self.vs[1]
         ac = self.vs[0] - self.vs[2]
-        direction = normalize(ray.direction)
+        direction = ray.direction
 
         A = np.concatenate(([ab], [ac], [direction]), axis=0)
         b = self.vs[0] - ray.origin
