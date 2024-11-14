@@ -96,30 +96,32 @@ class Sphere:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        a = np.dot(ray.direction, ray.direction)
-        b = 2*np.dot(ray.origin - self.center, ray.direction)
+        direction = ray.direction
+
+        a = np.dot(direction, direction)
+        b = 2.0*np.dot(ray.origin - self.center, direction)
         c = np.dot(ray.origin - self.center, ray.origin - self.center) - self.radius**2
-        if (b**2 - 4*a*c) < 0:
+        if (b**2.0 - 4.0*a*c) < 0.0:
             return no_hit
-        t1 = (-b+np.sqrt(b**2 - 4*a*c))/(2*a)
-        t2 = (-b-np.sqrt(b**2 - 4*a*c))/(2*a)
+        t1 = (-b+np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
+        t2 = (-b-np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
 
         if t1 < t2:
             if ray.start <= t1 <= ray.end:
-                normal = normalize(ray.origin + ray.direction*t1 - self.center)
-                return Hit(t1, ray.origin + ray.direction*t1, normal, self.material)
+                normal = normalize(ray.origin + direction*t1 - self.center)
+                return Hit(t1, ray.origin + direction*t1, normal, self.material)
             else:
                 if ray.start <= t2 <= ray.end:
-                    normal = normalize(ray.origin + ray.direction*t2 - self.center)
-                    return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
+                    normal = normalize(ray.origin + direction*t2 - self.center)
+                    return Hit(t2, ray.origin + direction*t2, normal, self.material)
         else:
             if ray.start <= t2 <= ray.end:
-                normal = normalize(ray.origin + ray.direction * t2 - self.center)
-                return Hit(t2, ray.origin + ray.direction*t2, normal, self.material)
+                normal = normalize(ray.origin + direction * t2 - self.center)
+                return Hit(t2, ray.origin + direction*t2, normal, self.material)
             else:
                 if ray.start <= t1 <= ray.end:
-                    normal = normalize(ray.origin + ray.direction * t1 - self.center)
-                    return Hit(t1, ray.origin + ray.direction * t1, normal, self.material)
+                    normal = normalize(ray.origin + direction * t1 - self.center)
+                    return Hit(t1, ray.origin + direction * t1, normal, self.material)
         return no_hit
 
 
@@ -144,17 +146,17 @@ class Triangle:
           Hit -- the hit data
         """
         # TODO A4 implement this function
-        # print(self.vs[0] - self.vs[1])
-        #
-        # print(self.vs[0] - self.vs[2])
-        # print(ray.direction)
-        A = np.concatenate(([self.vs[0] - self.vs[1]], [self.vs[0] - self.vs[2]], [ray.direction]), axis=0)
+        ab = self.vs[0] - self.vs[1]
+        ac = self.vs[0] - self.vs[2]
+        direction = normalize(ray.direction)
+
+        A = np.concatenate(([ab], [ac], [direction]), axis=0)
         b = self.vs[0] - ray.origin
         x = np.linalg.solve(A.T, b)
-        if x[0] > 0 and x[1] > 0 and (x[0] + x[1]) < 1:
+        if x[0] > 0.0 and x[1] > 0.0 and (x[0] + x[1]) < 1.0:
             if ray.start <= x[2] <= ray.end:
-                normal = normalize(np.cross(self.vs[0] - self.vs[1], self.vs[0] - self.vs[2]))
-                return Hit(x[2], ray.origin + ray.direction*x[2], normal, self.material)
+                normal = normalize(np.cross(ab, ac))
+                return Hit(x[2], ray.origin + direction*x[2], normal, self.material)
         return no_hit
 
 
@@ -179,11 +181,22 @@ class Camera:
         self.target = target
         self.up = up
         self.vfov = vfov
-        self.height = 2*self.f*np.tan(np.radians(vfov)/2)
+        self.height = 2.0*self.f*np.tan(np.radians(vfov)/2.0)
         self.width = aspect*self.height
         self.w = (self.target - self.eye)/self.f # away from viewing direction
-        self.u = np.cross(self.w, self.up) # right
-        self.v = np.cross(self.w, self.u) # up
+        self.u = normalize(np.cross(self.w, self.up)) # right
+        self.v = normalize(np.cross(self.w, self.u)) # up
+
+        rotate = np.eye(4)
+        rotate[0, :3] = self.u
+        rotate[1, :3] = self.v
+        rotate[2, :3] = self.w
+
+        transform = np.eye(4)
+        transform[:3, 3] = -self.eye
+
+        self.M = rotate@transform
+
 
     def generate_ray(self, img_point):
         """Compute the ray corresponding to a point in the image.
@@ -195,10 +208,10 @@ class Camera:
           Ray -- The ray corresponding to that image location (not necessarily normalized)
         """
         # TODO A4 implement this function
-        x = img_point[0] * 2 - 1
-        y = img_point[1] * 2 - 1
+        x = img_point[0] * 2.0 - 1.0
+        y = img_point[1] * 2.0 - 1.0
 
-        d = normalize(self.u * (x * self.width/2) + self.v * (y * self.height/2) + self.w * self.f)
+        d = normalize(self.u * (x * self.width/2.0) + self.v * (y * self.height/2.0) + self.w * self.f)
         return Ray(self.eye, d)
 
 
@@ -233,19 +246,16 @@ class PointLight:
 
         irradiance = max(np.dot(n, l), 0.0)
         # lambertian_shading = material.k_d * irradiance/(r**2) * self.intensity
-
         v = -normalize(ray.direction)
         h = normalize(v+l)
         specular = material.k_s*(np.dot(n, h))**material.p
         specular_light = (material.k_d + specular)*irradiance/(r**2) * self.intensity
-
-        shadow_ray = Ray(hit.point + n * 0.05, l)
-
+        shadow_ray = Ray(hit.point + n * 1e-5, l)
 
         if scene.intersect(shadow_ray) is no_hit:
             return specular_light
         else:
-            return vec([0,0,0])
+            return vec([0.0,0.0,0.0])
 
 
 class AmbientLight:
@@ -269,6 +279,7 @@ class AmbientLight:
           (3,) -- the light reflected from the surface
         """
         # TODO A4 implement this function
+
 
         return self.intensity * hit.material.k_a
 
@@ -306,8 +317,6 @@ class Scene:
 
         return closest_hit
 
-        # return self.surfs[0].intersect(ray)
-
 
 MAX_DEPTH = 4
 
@@ -326,25 +335,31 @@ def shade(ray, hit, scene, lights, depth=0):
     of MAX_DEPTH, with zero contribution beyond that depth.
     """
     # TODO A4 implement this function
+    # if hit is no_hit:
+    #     return scene.bg_color
+    # else:
+    #     return hit.material.k_d
+    #
+    direct = vec([0.0,0.0,0.0])
+
+    if depth > MAX_DEPTH:
+        return vec([0.0,0.0,0.0])
     if hit is no_hit:
         return scene.bg_color
 
-
-    if depth > MAX_DEPTH:
-        mirror = scene.bg_color
-    else:
-        n = hit.normal
-        v = -normalize(ray.direction)
-        r = 2 * np.dot(n,v) * n - v
-        reflected = Ray(hit.point, r)
-        mirror = hit.material.k_m * shade(reflected, hit, scene, lights, depth+1)
-
-
-    direct = vec([0,0,0])
     for light in lights:
         direct += light.illuminate(ray, hit, scene)
 
-    return direct + mirror
+    n = hit.normal
+    v = -normalize(ray.direction)
+    r = normalize(2.0 * np.dot(n,v) * n - v)
+    reflected = Ray(hit.point+r*1e-6, r)
+
+    new_hit = scene.intersect(reflected)
+    mirror = shade(reflected, new_hit, scene, lights, depth+1)
+    direct += hit.material.k_m * mirror
+
+    return direct
 
 
 def render_image(camera, scene, lights, nx, ny):
@@ -359,20 +374,19 @@ def render_image(camera, scene, lights, nx, ny):
       (ny, nx, 3) float32 -- the RGB image
     """
     # TODO A4 implement this function
+
     output_image = np.zeros((ny, nx, 3), np.float32)
     for i in range(ny):
         for j in range(nx):
-            #x = (j + 0.5) / nx
-            #y = (i + 0.5) / ny
-            ray = camera.generate_ray(vec([j/nx, i/ny])) # Generate Ray---we recommend just generating an orthographic ray to start with
-            #ray = Ray(vec([1-(2*i/ny), 1-(2*j/nx), 0]), vec([0,0,-1]))
-            intersection = scene.intersect(ray)  # this will return a Hit object
-
+            ray = camera.generate_ray(vec([(j+0.5)/nx, (i+0.5)/ny])) # Generate Ray---we recommend just generating an orthographic ray to start with
+            # ray = Ray(vec([1-(2*(i+0.5)/ny), 1-(2*(j+0.5)/nx), 0]), vec([0,0,-1]))
+            # intersection = scene.surfs[0].intersect(ray)  # this will return a Hit object
+            intersection = scene.intersect(ray)
             output_image[i, j] = shade(ray, intersection, scene, lights)
             # set the output pixel color if an intersection is found
-            #if intersection is not no_hit:
-            #    output_image[i, j] = vec([1.0, 1.0, 1.0])
-            #else:
-            #    output_image[i, j] = vec([0.0, 0.0, 0.0])
+            # if intersection is not no_hit:
+            #    output_image[i, j] = vec([1, 1, 1])
+            # else:
+            #    output_image[i, j] = vec([0,0,0])
 
     return output_image
