@@ -173,13 +173,13 @@ class Cylinder:
             if ray.start <= t1 <= ray.end:
                 hit_pt = ray.origin + direction * t1
                 if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
-                    normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
+                    normal = normalize(hit_pt - vec(self.center[0], hit_pt[1], self.center[2]))
                     return Hit(t1, ray.origin + direction*t1, normal, self.material)
             else:
                 if ray.start <= t2 <= ray.end:
                     hit_pt = ray.origin + direction * t2
                     if self.center[1] <= hit_pt[1] <= self.center[1] + self.height:
-                        normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
+                        normal = normalize(hit_pt - vec(self.center[0], hit_pt[1], self.center[2]))
                         return Hit(t2, ray.origin + direction*t2, normal, self.material)
 
         return no_hit
