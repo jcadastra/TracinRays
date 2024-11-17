@@ -502,3 +502,24 @@ def render_image(camera, scene, lights, nx, ny):
             #    output_image[i, j] = vec([0,0,0])
 
     return output_image
+
+class Union:
+    def __init__(self, object1, object2):
+        self.object1 = object1
+        self.object2 = object2
+
+    def intersect(self, ray):
+        hit1 = self.object1.intersect(ray)
+        hit2 = self.object2.intersect(ray)
+
+        if hit1 is no_hit and hit2 is no_hit:
+            return no_hit
+
+        if hit1 is no_hit:
+            return hit2
+        if hit2 is no_hit:
+            return hit1
+
+        if (hit1.t > hit2.t):
+            return hit2
+        return hit1
