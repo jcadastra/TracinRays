@@ -73,6 +73,64 @@ class Hit:
 no_hit = Hit(np.inf)
 
 
+class Cylinder:
+
+    def __init__(self, center, radius, height, material):
+        """Create a cylinder with the given center, height, and radius.
+
+        Parameters:
+          center : (3,) -- a 3D point specifying the cylinder's center
+          radius : float -- a Python float specifying the cylinder's radius
+          height : float -- a Python float specifying the cylinder's height
+          material : Material -- the material of the surface
+        """
+        self.center = center
+        self.radius = radius
+        self.height = height
+        self.material = material
+
+    def intersect(self, ray):
+        """Computes the first (smallest t) intersection between a ray and this cylinder.
+
+        Parameters:
+          ray : Ray -- the ray to intersect with the sphere
+        Return:
+          Hit -- the hit data
+        """
+        direction = ray.direction
+        dir_two = vec([direction[0], direction[2]])
+        oc = ray.origin - self.center
+        oc_two = vec([oc[0], oc[2]])
+
+        a = np.dot(dir_two, dir_two)
+        b = 2.0*np.dot(oc_two, dir_two)
+        c = np.dot(oc_two, oc_two) - self.radius**2
+        if (b**2.0 - 4.0*a*c) < 0.0:
+            return no_hit
+        t1 = (-b+np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
+        t2 = (-b-np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
+
+        if t1 >= t2:
+            tmp = t1
+            t1 = t2
+            t2 = tmp
+
+        if t1 < t2:
+            if ray.start <= t1 <= ray.end:
+                hit_pt = ray.origin + direction * t1
+                if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
+                    normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
+                    return Hit(t1, ray.origin + direction*t1, normal, self.material)
+            else:
+                if ray.start <= t2 <= ray.end:
+                    hit_pt = ray.origin + direction * t2
+                    if self.center[1] <= hit_pt[1] <= self.center[1] + self.height:
+                        normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
+                        return Hit(t2, ray.origin + direction*t2, normal, self.material)
+
+        return no_hit
+
+
 class Sphere:
 
     def __init__(self, center, radius, material):
