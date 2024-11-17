@@ -112,6 +112,7 @@ def CylinderExample():
 
     scene = ray.Scene([
         ray.Cylinder(vec([-0.7,0,0]), 0.5, 0.5, tan),
+        ray.Cylinder(vec([0.7,0,0]), 0.5, 0.5, tan),
     ])
 
     lights = [
@@ -128,6 +129,7 @@ def ConeExample():
 
     scene = ray.Scene([
         ray.Cone(vec([-0.7,0,0]), 0.5, 0.5, tan),
+        ray.Cylinder(vec([0.7,0,0]), 0.5, 0.5, tan),
     ])
 
     lights = [

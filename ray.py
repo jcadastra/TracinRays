@@ -89,43 +89,43 @@ class Cone:
         self.material = material
         self.angle = np.arctan(radius/height)
 
-        def intersect(self, ray):
-            """Computes the first (smallest t) intersection between a ray and this cone.
+    def intersect(self, ray):
+        """Computes the first (smallest t) intersection between a ray and this cone.
 
-            Parameters:
-              ray : Ray -- the ray to intersect with the cone
-            Return:
-              Hit -- the hit data
-            """
-            direction = ray.direction
-            dir_two = vec([direction[0], direction[2]])
-            oc = ray.origin - self.center
-            oc_two = vec([oc[0], oc[2]])
+        Parameters:
+          ray : Ray -- the ray to intersect with the cone
+        Return:
+          Hit -- the hit data
+        """
+        direction = ray.direction
+        dir_two = vec([direction[0], direction[2]])
+        oc = ray.origin - self.center
+        oc_two = vec([oc[0], oc[2]])
 
-            a = np.dot(dir_two, dir_two) - (np.tan(self.angle) ** 2) * direction[1] ** 2
-            b = 2.0 * (np.dot(oc_two, dir_two) - np.tan(self.angle) ** 2 * oc[1] * direction[1])
-            c = np.dot(oc_two, oc_two) - (np.tan(self.angle) ** 2) * oc[1] ** 2
+        a = np.dot(dir_two, dir_two) - (np.tan(self.angle) ** 2) * direction[1] ** 2
+        b = 2.0 * (np.dot(oc_two, dir_two) - np.tan(self.angle) ** 2 * oc[1] * direction[1])
+        c = np.dot(oc_two, oc_two) - (np.tan(self.angle) ** 2) * oc[1] ** 2
 
-            determinant = b**2.0 - 4.0*a*c
-            if determinant < 0.0:
-                return no_hit
-
-            t1 = -b+np.sqrt(determinant/(2.0*a))
-            t2 = -b-np.sqrt(determinant/(2.0*a))
-
-            if t1 >= t2:
-                tmp = t1
-                t1 = t2
-                t2 = tmp
-
-            for t in [t1, t2]:
-                if ray.start <= t <= ray.end:
-                    hit_pt = ray.origin + t * direction
-                    if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
-                        normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
-                        return Hit(t, ray.origin + direction*t1, normal, self.material)
-
+        determinant = b**2.0 - 4.0*a*c
+        if determinant < 0.0:
             return no_hit
+
+        t1 = -b+np.sqrt(determinant/(2.0*a))
+        t2 = -b-np.sqrt(determinant/(2.0*a))
+
+        if t1 >= t2:
+            tmp = t1
+            t1 = t2
+            t2 = tmp
+
+        for t in [t1, t2]:
+            if ray.start <= t <= ray.end:
+                hit_pt = ray.origin + t * direction
+                if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
+                    normal = normalize(hit_pt - vec([hit_pt[0], self.center[1], hit_pt[2]]))
+                    return Hit(t, ray.origin + direction*t1, normal, self.material)
+
+        return no_hit
 
 class Cylinder:
 
