@@ -523,3 +523,38 @@ class Union:
         if (hit1.t > hit2.t):
             return hit2
         return hit1
+
+class Intersection:
+
+    def __init__(self, object1, object2):
+        self.object1 = object1
+        self.object2 = object2
+
+    def intersect(self, ray):
+        hit1 = self.object1.intersect(ray)
+        hit2 = self.object2.intersect(ray)
+
+        if hit1 is no_hit or hit2 is no_hit:
+            return no_hit
+
+        if (hit1.t > hit2.t):
+            return hit1
+        return hit2
+
+class Difference:
+
+    def __init__(self, base, cut):
+        self.base = base
+        self.cut = cut
+
+    def intersect(self, ray):
+        hit1 = self.object1.intersect(ray)
+        hit2 = self.object2.intersect(ray)
+
+        if hit1 is no_hit:
+            return no_hit
+
+        if hit2 is not no_hit and (hit1.t > hit2.t):
+            return hit2
+
+        return hit1

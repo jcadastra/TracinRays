@@ -7,8 +7,8 @@ blue = Material(vec([0.2, 0.2, 0.5]), k_m=0.5)
 gray = Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
 
 scene = Scene([
-    Cylinder(vec([-0.7,0,0]), 0.5, 0.5, tan),
-    Cylinder(vec([0.7,0,0]), 0.5, 1, blue),
+    Cylinder(vec([-0.7,0,0]), 0.2, 6, tan),
+    Cylinder(vec([0.7,0,0]), 0.2, 12, blue),
     Sphere(vec([0,-40,0]), 39.5, gray),
 ])
 
