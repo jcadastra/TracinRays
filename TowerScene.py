@@ -32,17 +32,19 @@ def Tower():
     tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
     gray = ray.Material(vec([0.2, 0.2, 0.2]))
 
-    g1 = ray.Sphere(vec([0, -46.0012, 0]), 45, gray)
-    g2 = ray.Sphere(vec([0, -45.5, 0]), 44.5, tan)
-    c1 = ray.Cylinder(vec([0, -1, 0]), 0.13, 0.6, tan) # bottom cylinder
-    c2 = ray.Cylinder(vec([-0.1, -0.4, 0.1]), 0.06, 1.5, tan) # middle left
-    c3 = ray.Cylinder(vec([0.1, -0.4, 0.1]), 0.06, 1.5, tan) # middle right
-    c4 = ray.Cylinder(vec([0, -0.4, -0.1]), 0.06, 1.5, tan) # middle middle
-    c5 = ray.Cylinder(vec([0, 1.1, 0]), 0.06, 0.6, tan) # top
+    g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, gray)
+    g2 = ray.Sphere(vec([0, -45.5, 0.6]), 44.5, tan)
+    c1 = ray.Cylinder(vec([0, -1, 0.6]), 0.13, 0.6, tan) # bottom cylinder
+    c2 = ray.Cylinder(vec([-0.1, -0.4, 0.7]), 0.06, 1.5, tan) # middle left
+    c3 = ray.Cylinder(vec([0.1, -0.4, 0.7]), 0.06, 1.5, tan) # middle right
+    c4 = ray.Cylinder(vec([0, -0.4, 0.5]), 0.06, 1.5, tan) # middle middle
+    c5 = ray.Cylinder(vec([0, 1.1, 0.6]), 0.06, 0.6, tan) # top
+    c6 = ray.Cylinder(vec([0, 1.7, 0.6]), 0.04, 0.3, tan)
+    cone_1 = ray.Cone(vec([0, 2.5, 0.6]), 0.05, 0.6, tan)
     ground = ray.Union(g1, g2)
-    big_sphere = ray.Sphere(vec([0, -0.4, 0]), 0.3, tan)
-    small_sphere = ray.Sphere(vec([0, 1.1, 0]), 0.25, tan)
-    smaller_sphere = ray.Sphere(vec([0, 1.7, 0]), 0.1, tan)
+    big_sphere = ray.Sphere(vec([0, -0.4, 0.6]), 0.3, tan)
+    small_sphere = ray.Sphere(vec([0, 1.1, 0.6]), 0.25, tan)
+    smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tan)
 
     scene = ray.Scene([
         # ray.Sphere(vec([-0.5, 0, 0]), 0.5, tan),
@@ -53,6 +55,8 @@ def Tower():
         c3,
         c4,
         c5,
+        c6,
+        cone_1,
         big_sphere,
         small_sphere,
         smaller_sphere,
@@ -63,5 +67,5 @@ def Tower():
         ray.AmbientLight(0.1),
     ]
 
-    camera = ray.Camera(vec([0, 0, 11]), target=vec([0, 0, 0]), vfov=25, aspect=9 / 16)
+    camera = ray.Camera(vec([0, 0, 11.7]), target=vec([0, 0, 0]), vfov=25, aspect=1 / 1)
     return ExampleSceneDef(camera=camera, scene=scene, lights=lights);

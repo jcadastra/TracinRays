@@ -121,9 +121,10 @@ class Cone:
         for t in [t1, t2]:
             if ray.start <= t <= ray.end:
                 hit_pt = ray.origin + t * direction
-                if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
+                if self.center[1] - self.height <= hit_pt[1] <= self.center[1]:
                     #normal = normalize(hit_pt - np.array(vec([hit_pt[0], self.center[1], hit_pt[2]]), dtype=np.float64))
                     normal = normalize(np.tan(self.angle)*(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), dtype=np.float64)))
+                    #normal[1] = -np.tan(self.angle)
                     return Hit(t, ray.origin + direction*t1, normal, self.material)
 
         return no_hit
