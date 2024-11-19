@@ -131,7 +131,7 @@ class Cone:
 
 class Cylinder:
 
-    def __init__(self, center, radius, height, material):
+    def __init__(self, center, radius, height, material, orientation=np.array(vec([0,1,0]), dtype=np.float64)):
         """Create a cylinder with the given center, height, and radius.
 
         Parameters:
@@ -144,6 +144,8 @@ class Cylinder:
         self.radius = radius
         self.height = height
         self.material = material
+        self.orientation = orientation
+        self.rot_matrix = np.eye(3)
 
     def intersect(self, ray):
         """Computes the first (smallest t) intersection between a ray and this cylinder.

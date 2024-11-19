@@ -91,6 +91,30 @@ def CubeExample():
     camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
     return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
 
+def RectangularExample():
+    importlib.reload(ray)
+    tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
+    gray = ray.Material(vec([0.2, 0.2, 0.2]))
+
+    # Read the triangle mesh for a 2x2x2 cube, and scale it down to 1x1x1 to fit the scene.
+    vs_list = 0.5 * read_obj_triangles(open("rectangular.obj"))
+
+    scene = ray.Scene([
+                      # Make a big sphere for the floor
+                      ray.Sphere(vec([0, -40, 0]), 39.5, gray),
+                  ] + [
+                      # Make triangle objects from the vertex coordinates
+                      ray.Triangle(vs, tan) for vs in vs_list
+                  ])
+
+    lights = [
+        ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        ray.AmbientLight(0.1),
+    ]
+
+    camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
+    return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
+
 def OrthoFriendlyExample(sphere_radius = 0.25):
     gray = ray.Material(vec([0.5, 0.5, 0.5]))
 

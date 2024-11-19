@@ -46,6 +46,9 @@ def Tower():
     small_sphere = ray.Sphere(vec([0, 1.1, 0.6]), 0.25, tan)
     smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tan)
 
+    vs_list = 0.6 * read_obj_triangles(open("rectangular_1.obj"))
+    rec_1 = [ray.Triangle(vs, tan) for vs in vs_list]
+
     scene = ray.Scene([
         # ray.Sphere(vec([-0.5, 0, 0]), 0.5, tan),
         # ray.Sphere(vec([0, -0.5, 1]), 0.5, gray),
@@ -60,7 +63,7 @@ def Tower():
         big_sphere,
         small_sphere,
         smaller_sphere,
-    ])
+    ] + rec_1)
 
     lights = [
         ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
