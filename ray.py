@@ -549,13 +549,16 @@ class Difference:
         self.cut = cut
 
     def intersect(self, ray):
-        hit1 = self.object1.intersect(ray)
-        hit2 = self.object2.intersect(ray)
+        hit1 = self.base.intersect(ray)
+        hit2 = self.cut.intersect(ray)
 
         if hit1 is no_hit:
             return no_hit
 
-        if hit2 is not no_hit and (hit1.t > hit2.t):
-            return hit2
+        if hit2 is no_hit:
+            return hit1
+
+        if hit1.t > hit2.t:
+            return no_hit
 
         return hit1

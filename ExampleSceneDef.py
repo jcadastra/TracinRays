@@ -145,12 +145,58 @@ def IntersectionExample():
     tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
     gray = ray.Material(vec([0.2, 0.2, 0.2]))
 
-    s1 = ray.Sphere(vec([0, 0, 0]), 0.5, tan)
-    s2 = ray.Sphere(vec([0, -20, 0]), 39.5, gray)
+    # s1 = ray.Sphere(vec([0, 0, 0]), 0.5, tan)
+    # s2 = ray.Sphere(vec([0, -20, 0]), 39.5, gray)
+    s1 = ray.Cylinder(vec([-0.7,0,0]), 0.3, 0.5, tan)
+    s2 = ray.Sphere(vec([-0.9, 0, 0]), 0.4, gray)
     int = ray.Intersection(s1, s2)
 
     scene = ray.Scene([
-        int.intersect(ray)
+        int
+    ])
+
+    lights = [
+        ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        ray.AmbientLight(0.1),
+    ]
+    camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
+    return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
+
+def DifferenceExample():
+    importlib.reload(ray)
+    tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
+    gray = ray.Material(vec([0.2, 0.2, 0.2]))
+
+    # s1 = ray.Sphere(vec([0, 0, 0]), 0.5, tan)
+    # s2 = ray.Sphere(vec([0, 0.25, 0]), 0.5, gray)
+    s1 = ray.Cylinder(vec([-0.7,0,0]), 0.3, 0.5, tan)
+    s2 = ray.Sphere(vec([-0.9, 0, 0]), 0.4, gray)
+    dif = ray.Difference(s1, s2)
+
+    scene = ray.Scene([
+        dif
+    ])
+
+    lights = [
+        ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        ray.AmbientLight(0.1),
+    ]
+    camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
+    return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
+
+def UnionExample():
+    importlib.reload(ray)
+    tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
+    gray = ray.Material(vec([0.2, 0.2, 0.2]))
+
+    # s1 = ray.Sphere(vec([0, 0, 0]), 0.5, tan)
+    # s2 = ray.Sphere(vec([0, 0.25, 0]), 0.5, gray)
+    s1 = ray.Cylinder(vec([-0.7,0,0]), 0.3, 0.5, tan)
+    s2 = ray.Sphere(vec([-0.9, 0, 0]), 0.4, gray)
+    uni = ray.Union(s1, s2)
+
+    scene = ray.Scene([
+        uni
     ])
 
     lights = [
