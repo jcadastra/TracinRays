@@ -98,9 +98,9 @@ class Cone:
           Hit -- the hit data
         """
         direction = ray.direction
-        dir_two = vec([direction[0], direction[2]])
+        dir_two = np.array(vec([direction[0], direction[2]]), dtype=np.float64)
         oc = ray.origin - self.center
-        oc_two = vec([oc[0], oc[2]])
+        oc_two = np.array(vec([oc[0], oc[2]]), dtype=np.float64)
 
         a = np.dot(dir_two, dir_two) - (np.tan(self.angle) ** 2) * direction[1] ** 2
         b = 2.0 * (np.dot(oc_two, dir_two) - np.tan(self.angle) ** 2 * oc[1] * direction[1])
@@ -110,8 +110,8 @@ class Cone:
         if determinant < 0.0:
             return no_hit
 
-        t1 = -b+np.sqrt(determinant/(2.0*a))
-        t2 = -b-np.sqrt(determinant/(2.0*a))
+        t1 = (-b+np.sqrt(determinant))/(2.0*a)
+        t2 = (-b-np.sqrt(determinant))/(2.0*a)
 
         if t1 >= t2:
             tmp = t1
@@ -122,7 +122,8 @@ class Cone:
             if ray.start <= t <= ray.end:
                 hit_pt = ray.origin + t * direction
                 if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
-                    normal = normalize(hit_pt - np.array(vec([hit_pt[0], self.center[1], hit_pt[2]]), np.float64))
+                    #normal = normalize(hit_pt - np.array(vec([hit_pt[0], self.center[1], hit_pt[2]]), dtype=np.float64))
+                    normal = normalize(np.tan(self.angle)*(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), dtype=np.float64)))
                     return Hit(t, ray.origin + direction*t1, normal, self.material)
 
         return no_hit
@@ -152,7 +153,7 @@ class Cylinder:
           Hit -- the hit data
         """
         direction = ray.direction
-        dir_two = vec([direction[0], direction[2]])
+        dir_two = np.array(vec([direction[0], direction[2]]), dtype=np.float64)
         oc = ray.origin - self.center
         oc_two = vec([oc[0], oc[2]])
 
@@ -173,13 +174,13 @@ class Cylinder:
             if ray.start <= t1 <= ray.end:
                 hit_pt = ray.origin + direction * t1
                 if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
-                    normal = normalize(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), np.float64))
+                    normal = normalize(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), dtype=np.float64))
                     return Hit(t1, ray.origin + direction*t1, normal, self.material)
             else:
                 if ray.start <= t2 <= ray.end:
                     hit_pt = ray.origin + direction * t2
                     if self.center[1] <= hit_pt[1] <= self.center[1] + self.height:
-                        normal = normalize(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), np.float64))
+                        normal = normalize(hit_pt - np.array(vec([self.center[0], hit_pt[1], self.center[2]]), dtype=np.float64))
                         return Hit(t2, ray.origin + direction*t2, normal, self.material)
 
         return no_hit
