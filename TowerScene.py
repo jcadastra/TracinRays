@@ -56,25 +56,52 @@ def Tower():
     vs_list_2 = 0.3 * read_obj_triangles(open("rectangular_2.obj"))
     vs_list_3 = 0.4 * read_obj_triangles(open("rectangular_3.obj"))
     rec_1 = [ray.Triangle(vs, tan) for vs in vs_list_1]
+    rec_1_union = rec_1[0]
+    for tri in rec_1:
+        rec_1_union = ray.Union(rec_1_union, tri)
     rec_2 = [ray.Triangle(vs, tan) for vs in vs_list_2]
+    rec_2_union = rec_2[0]
+    for tri in rec_2:
+        rec_2_union = ray.Union(rec_2_union, tri)
     rec_3 = [ray.Triangle(vs, tan) for vs in vs_list_3]
+    rec_3_union = rec_3[0]
+    for tri in rec_3:
+        rec_3_union = ray.Union(rec_3_union, tri)
+    tower = ray.Union(big_sphere, c1)
+    tower = ray.Union(tower, c2)
+    tower = ray.Union(tower, c3)
+    tower = ray.Union(tower, c4)
+    tower = ray.Union(tower, c5)
+    tower = ray.Union(tower, c6)
+    tower = ray.Union(tower, cone_1)
+    tower = ray.Union(tower, small_sphere)
+    tower = ray.Union(tower, smaller_sphere)
+    tower = ray.Union(tower, tiny_sphere1)
+    tower = ray.Union(tower, tiny_sphere2)
+    main_scene = ray.Union(ground, tower)
+    main_scene = ray.Union(main_scene, biggest_sphere)
+    main_scene = ray.Union(main_scene, rec_1_union)
+    main_scene = ray.Union(main_scene, rec_2_union)
+    main_scene = ray.Union(main_scene, rec_3_union)
 
     scene = ray.Scene([
-        ground,
-        c1,
-        c2,
-        c3,
-        c4,
-        c5,
-        c6,
-        cone_1,
-        big_sphere,
-        small_sphere,
-        smaller_sphere,
-        tiny_sphere1,
-        tiny_sphere2,
-        biggest_sphere,
-    ] + rec_1 + rec_2 + rec_3, bg_color=vec([0,0,0]))
+        #ground,
+        # c1,
+        # c2,
+        # c3,
+        # c4,
+        # c5,
+        # c6,
+        # cone_1,
+        # big_sphere,
+        # small_sphere,
+        # smaller_sphere,
+        # tiny_sphere1,
+        # tiny_sphere2,
+        #tower,
+        #biggest_sphere,
+        main_scene
+    ], bg_color=vec([0,0,0]))
 
     lights = [
         # ray.PointLight(vec([-12, 10, 5]), vec([300, 300, 300])),
