@@ -251,10 +251,10 @@ class Sphere:
     def get_uv_coordinates(self, point):
 
         x = point[0]
-        y = point[1]
+        z = point[2]
 
-        u = (x / self.radius + 1) / 2
-        v = (y / self.radius + 1) / 2
+        u = np.clip((x / (self.radius/20) + 1) / 2, 0, 1)
+        v = np.clip((z / (self.radius/2.5) + 1) / 2, 0, 1)
 
         return u, v # [0, 1]
 
@@ -263,7 +263,7 @@ class Sphere:
         u = int(np.floor(u * (self.normal_map.shape[0] - 1)))
         v = int(np.floor(v * (self.normal_map.shape[1] - 1)))
 
-        normal_color = self.normal_map[u, v] / 255.0
+        normal_color = abs(self.normal_map[u, v] / 255.0)
 
         return normalize(normal_color)
 

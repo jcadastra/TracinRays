@@ -36,7 +36,7 @@ def Tower():
     #gray = ray.Material(vec([0.2, 0.2, 0.2]))
     #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
     gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
-    blue = ray.Material(vec([181/255, 214/255, 219/255]), k_m=0.4)
+    blue = ray.Material(vec([181/255, 214/255, 219/255]))#, k_m=0.4)
 
     g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, blue, normal_map=normal_map)
     g2 = ray.Sphere(vec([0, -45.5, 0.6]), 44.5, tan)
@@ -88,7 +88,7 @@ def Tower():
     main_scene = ray.Union(main_scene, rec_3_union)
 
     scene = ray.Scene([
-        #ground,
+        ground,
         # c1,
         # c2,
         # c3,
@@ -103,7 +103,7 @@ def Tower():
         # tiny_sphere2,
         #tower,
         biggest_sphere,
-        main_scene
+        #main_scene
     ], bg_color=vec([0,0,0]))
 
     lights = [
