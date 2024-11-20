@@ -53,7 +53,7 @@ def Tower():
     smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tri)
     tiny_sphere1 = ray.Sphere(vec([0, 0.15, 0.6]), 0.07, tri)
     tiny_sphere2 = ray.Sphere(vec([0, 0.55, 0.6]), 0.07, tri)
-    biggest_sphere = ray.Sphere(vec([1.5, -0.4, 2]), 0.8, tri)
+    biggest_sphere = ray.Difference(ray.Sphere(vec([1.5, -0.4, 2]), 0.8, tri), g2)
 
     vs_list_1 = 0.4 * read_obj_triangles(open("rectangular_1.obj"))
     vs_list_2 = 0.3 * read_obj_triangles(open("rectangular_2.obj"))
@@ -82,7 +82,7 @@ def Tower():
     tower = ray.Union(tower, tiny_sphere1)
     tower = ray.Union(tower, tiny_sphere2)
     main_scene = ray.Union(ground, tower)
-    main_scene = ray.Union(main_scene, biggest_sphere)
+    #main_scene = ray.Union(main_scene, biggest_sphere)
     main_scene = ray.Union(main_scene, rec_1_union)
     main_scene = ray.Union(main_scene, rec_2_union)
     main_scene = ray.Union(main_scene, rec_3_union)
@@ -102,7 +102,7 @@ def Tower():
         # tiny_sphere1,
         # tiny_sphere2,
         #tower,
-        #biggest_sphere,
+        biggest_sphere,
         main_scene
     ], bg_color=vec([0,0,0]))
 

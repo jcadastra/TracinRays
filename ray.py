@@ -234,7 +234,7 @@ class Sphere:
                 normal = normalize(ray.origin + direction*t1 - self.center)
                 if self.normal_map is not None:
                     uv = self.get_uv_coordinates(ray.origin + direction*t1)
-                    sampled_normal = self.sample_normal_map(uv)
+                    sampled_normal = self.get_normal(uv)
                     normal = normalize(sampled_normal)
                 return Hit(t1, ray.origin + direction*t1, normal, self.material)
             else:
@@ -242,17 +242,10 @@ class Sphere:
                     normal = normalize(ray.origin + direction*t2 - self.center)
                     if self.normal_map is not None:
                         uv = self.get_uv_coordinates(ray.origin + direction * t2)
-                        sampled_normal = self.sample_normal_map(uv)
+                        sampled_normal = self.get_normal(uv)
                         normal = normalize(sampled_normal)
                     return Hit(t2, ray.origin + direction*t2, normal, self.material)
-        # else:
-        #     if ray.start <= t2 <= ray.end:
-        #         normal = normalize(ray.origin + direction * t2 - self.center)
-        #         return Hit(t2, ray.origin + direction*t2, normal, self.material)
-        #     else:
-        #         if ray.start <= t1 <= ray.end:
-        #             normal = normalize(ray.origin + direction * t1 - self.center)
-        #             return Hit(t1, ray.origin + direction * t1, normal, self.material)
+
         return no_hit
 
     def get_uv_coordinates(self, point):
@@ -265,21 +258,12 @@ class Sphere:
 
         return u, v # [0, 1]
 
-    def sample_normal_map(self, uv):
-        """Sample the normal map at given UV coordinates.
-
-        Parameters:
-          uv : tuple -- the UV coordinates (u, v)
-        Returns:
-          normal : (3,) -- the sampled normal (as a vector)
-        """
+    def get_normal(self, uv):
         u, v = uv
         u = int(np.floor(u * (self.normal_map.shape[0] - 1)))
         v = int(np.floor(v * (self.normal_map.shape[1] - 1)))
 
         normal_color = self.normal_map[u, v] / 255.0
-
-        #normal = 2 * normal_color - 1  # RGB [0, 1] -> Normal [-1, 1]
 
         return normalize(normal_color)
 
