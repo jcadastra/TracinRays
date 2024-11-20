@@ -158,7 +158,7 @@ class Cylinder:
         direction = ray.direction
         dir_two = np.array(vec([direction[0], direction[2]]), dtype=np.float64)
         oc = ray.origin - self.center
-        oc_two = vec([oc[0], oc[2]])
+        oc_two = np.array(vec([oc[0], oc[2]]), dtype=np.float64)
 
         a = np.dot(dir_two, dir_two)
         b = 2.0*np.dot(oc_two, dir_two)

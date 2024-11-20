@@ -29,8 +29,10 @@ class ExampleSceneDef(object):
 
 def Tower():
     importlib.reload(ray)
-    tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
-    gray = ray.Material(vec([0.2, 0.2, 0.2]))
+    tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6)
+    #gray = ray.Material(vec([0.2, 0.2, 0.2]))
+    #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
+    gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
 
     g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, gray)
     g2 = ray.Sphere(vec([0, -45.5, 0.6]), 44.5, tan)
@@ -50,23 +52,22 @@ def Tower():
     rec_1 = [ray.Triangle(vs, tan) for vs in vs_list]
 
     scene = ray.Scene([
-        # ray.Sphere(vec([-0.5, 0, 0]), 0.5, tan),
-        # ray.Sphere(vec([0, -0.5, 1]), 0.5, gray),
         ground,
         c1,
         c2,
         c3,
-        c4,
-        c5,
-        c6,
-        cone_1,
-        big_sphere,
-        small_sphere,
-        smaller_sphere,
+        # c4,
+        # c5,
+        # c6,
+        # cone_1,
+        # big_sphere,
+        # small_sphere,
+        # smaller_sphere,
     ] + rec_1)
 
     lights = [
-        ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        # ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        ray.PointLight(vec([12, 10, 5]), vec([235, 48, 133])),
         ray.AmbientLight(0.1),
     ]
 
