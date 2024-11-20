@@ -174,7 +174,7 @@ class Cylinder:
             t1 = t2
             t2 = tmp
 
-        if t1 < t2:
+        if t1 <= t2:
             if ray.start <= t1 <= ray.end:
                 hit_pt = ray.origin + direction * t1
                 if self.center[1] <= hit_pt[1] <= self.center[1]+self.height:
@@ -192,7 +192,7 @@ class Cylinder:
 
 class Sphere:
 
-    def __init__(self, center, radius, material):
+    def __init__(self, center, radius, material, normal_map=None):
         """Create a sphere with the given center and radius.
 
         Parameters:
@@ -203,6 +203,7 @@ class Sphere:
         self.center = center
         self.radius = radius
         self.material = material
+        self.normal_map = normal_map
 
     def intersect(self, ray):
         """Computes the first (smallest t) intersection between a ray and this sphere.
@@ -223,24 +224,64 @@ class Sphere:
         t1 = (-b+np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
         t2 = (-b-np.sqrt(b**2.0 - 4.0*a*c))/(2.0*a)
 
-        if t1 < t2:
+        if t1 >= t2:
+            tmp = t1
+            t1 = t2
+            t2 = tmp
+
+        if t1 <= t2:
             if ray.start <= t1 <= ray.end:
                 normal = normalize(ray.origin + direction*t1 - self.center)
+                if self.normal_map is not None:
+                    uv = self.get_uv_coordinates(ray.origin + direction*t1)
+                    sampled_normal = self.sample_normal_map(uv)
+                    normal = normalize(sampled_normal)
                 return Hit(t1, ray.origin + direction*t1, normal, self.material)
             else:
                 if ray.start <= t2 <= ray.end:
                     normal = normalize(ray.origin + direction*t2 - self.center)
+                    if self.normal_map is not None:
+                        uv = self.get_uv_coordinates(ray.origin + direction * t2)
+                        sampled_normal = self.sample_normal_map(uv)
+                        normal = normalize(sampled_normal)
                     return Hit(t2, ray.origin + direction*t2, normal, self.material)
-        else:
-            if ray.start <= t2 <= ray.end:
-                normal = normalize(ray.origin + direction * t2 - self.center)
-                return Hit(t2, ray.origin + direction*t2, normal, self.material)
-            else:
-                if ray.start <= t1 <= ray.end:
-                    normal = normalize(ray.origin + direction * t1 - self.center)
-                    return Hit(t1, ray.origin + direction * t1, normal, self.material)
+        # else:
+        #     if ray.start <= t2 <= ray.end:
+        #         normal = normalize(ray.origin + direction * t2 - self.center)
+        #         return Hit(t2, ray.origin + direction*t2, normal, self.material)
+        #     else:
+        #         if ray.start <= t1 <= ray.end:
+        #             normal = normalize(ray.origin + direction * t1 - self.center)
+        #             return Hit(t1, ray.origin + direction * t1, normal, self.material)
         return no_hit
 
+    def get_uv_coordinates(self, point):
+
+        x = point[0]
+        y = point[1]
+
+        u = (x / self.radius + 1) / 2
+        v = (y / self.radius + 1) / 2
+
+        return u, v # [0, 1]
+
+    def sample_normal_map(self, uv):
+        """Sample the normal map at given UV coordinates.
+
+        Parameters:
+          uv : tuple -- the UV coordinates (u, v)
+        Returns:
+          normal : (3,) -- the sampled normal (as a vector)
+        """
+        u, v = uv
+        u = int(np.floor(u * (self.normal_map.shape[0] - 1)))
+        v = int(np.floor(v * (self.normal_map.shape[1] - 1)))
+
+        normal_color = self.normal_map[u, v] / 255.0
+
+        #normal = 2 * normal_color - 1  # RGB [0, 1] -> Normal [-1, 1]
+
+        return normalize(normal_color)
 
 class Triangle:
 

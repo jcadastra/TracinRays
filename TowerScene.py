@@ -2,6 +2,7 @@ import ray
 from ImLite import *
 from utils import *
 import importlib
+from PIL import Image as PILImage
 
 class ExampleSceneDef(object):
     def __init__(self, camera, scene, lights):
@@ -29,13 +30,15 @@ class ExampleSceneDef(object):
 
 def Tower():
     importlib.reload(ray)
+    normal_map = np.array(PILImage.open('water_normal.jpg').convert("RGB"))
     tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6)
     tri = ray.Material(vec([151/255, 152/255, 144/255]), k_s=0.5, k_m=0.4, opacity=0.5)
     #gray = ray.Material(vec([0.2, 0.2, 0.2]))
     #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
     gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
+    blue = ray.Material(vec([181/255, 214/255, 219/255]), k_m=0.4)
 
-    g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, gray)
+    g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, blue, normal_map=normal_map)
     g2 = ray.Sphere(vec([0, -45.5, 0.6]), 44.5, tan)
     c1 = ray.Cylinder(vec([0, -1, 0.6]), 0.13, 0.6, tan) # bottom cylinder
     c2 = ray.Cylinder(vec([-0.1, -0.4, 0.7]), 0.06, 1.5, tan) # middle left
