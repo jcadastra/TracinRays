@@ -2,6 +2,7 @@ import ray
 from ImLite import *
 from utils import *
 import importlib
+from PIL import Image as PILImage
 
 class ExampleSceneDef(object):
     def __init__(self, camera, scene, lights):
@@ -249,12 +250,12 @@ def TransparencyExample():
 
 def SkyboxExample():
     importlib.reload(ray)
-    right = Image.open('nightBox_right.jpg.jpg').convert("RGB")
-    left = Image.open('nightBox_left.jpg.jpg').convert("RGB")
-    up = Image.open('nightBox_up.jpg.jpg').convert("RGB")
-    down = Image.open('nightBox_down.jpg.jpg').convert("RGB")
-    forward = Image.open('nightBox_forward.jpg.jpg').convert("RGB")
-    back = Image.open('nightBox_back.jpg.jpg').convert("RGB")
+    right = np.array(PILImage.open('nightBox_right.jpg').convert("RGB"))
+    left = np.array(PILImage.open('nightBox_left.jpg').convert("RGB"))
+    up = np.array(PILImage.open('nightBox_up.jpg').convert("RGB"))
+    down = np.array(PILImage.open('nightBox_down.jpg').convert("RGB"))
+    forward = np.array(PILImage.open('nightBox_forward.jpg').convert("RGB"))
+    back = np.array(PILImage.open('nightBox_back.jpg').convert("RGB"))
     skybox = ray.Skybox(right, left, up, down, forward, back)
     tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
     gray = ray.Material(vec([0.2, 0.2, 0.2]))

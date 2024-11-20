@@ -594,7 +594,6 @@ class Skybox:
         - forward: Texture for the forward face (positive Z)
         - back: Texture for the back face (negative Z)
         """
-        # Store the textures as a dictionary
         self.cube_map = {
             'right': right,
             'left': left,
@@ -660,8 +659,8 @@ class Skybox:
         # tex_x = int(u * texture.shape[1])  # Width of texture
         # tex_y = int(v * texture.shape[0])  # Height of texture
         x, y = texture.shape[:2]
-        x = int(u*y)
-        y = int(v*x)
+        x = int(u*(y-1))
+        y = int(v*(x-1))
 
         # Return the color from the texture at the calculated coordinates
-        return texture[y, x]  # Return RGB value from the texture
+        return texture[y, x]
