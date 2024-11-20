@@ -30,6 +30,7 @@ class ExampleSceneDef(object):
 def Tower():
     importlib.reload(ray)
     tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6)
+    tri = ray.Material(vec([151/255, 152/255, 144/255]), k_s=0.5, k_m=0.4, opacity=0.5)
     #gray = ray.Material(vec([0.2, 0.2, 0.2]))
     #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
     gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
@@ -44,9 +45,11 @@ def Tower():
     c6 = ray.Cylinder(vec([0, 1.7, 0.6]), 0.04, 0.3, tan)
     cone_1 = ray.Cone(vec([0, 2.5, 0.6]), 0.05, 0.6, tan)
     ground = ray.Union(g1, g2)
-    big_sphere = ray.Sphere(vec([0, -0.4, 0.6]), 0.3, tan)
-    small_sphere = ray.Sphere(vec([0, 1.1, 0.6]), 0.25, tan)
-    smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tan)
+    big_sphere = ray.Sphere(vec([0, -0.4, 0.6]), 0.3, tri)
+    small_sphere = ray.Sphere(vec([0, 1.1, 0.6]), 0.25, tri)
+    smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tri)
+    tiny_sphere1 = ray.Sphere(vec([0, 0.15, 0.6]), 0.07, tri)
+    tiny_sphere2 = ray.Sphere(vec([0, 0.55, 0.6]), 0.07, tri)
 
     vs_list = 0.6 * read_obj_triangles(open("rectangular_1.obj"))
     rec_1 = [ray.Triangle(vs, tan) for vs in vs_list]
@@ -56,18 +59,24 @@ def Tower():
         c1,
         c2,
         c3,
-        # c4,
-        # c5,
-        # c6,
-        # cone_1,
-        # big_sphere,
-        # small_sphere,
-        # smaller_sphere,
-    ] + rec_1)
+        c4,
+        c5,
+        c6,
+        cone_1,
+        big_sphere,
+        small_sphere,
+        smaller_sphere,
+        tiny_sphere1,
+        tiny_sphere2,
+    #] + rec_1)
+    ])
 
     lights = [
-        # ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        # ray.PointLight(vec([-12, 10, 5]), vec([300, 300, 300])),
         ray.PointLight(vec([12, 10, 5]), vec([235, 48, 133])),
+        # ray.PointLight(vec([0, 0.35, 0.6]), vec([52, 249, 56])),
+        ray.PointLight(vec([-12, 10, 5]), vec([52, 249, 56])),
+        ray.PointLight(vec([0, 10, 5]), vec([52, 237, 249])),
         ray.AmbientLight(0.1),
     ]
 

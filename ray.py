@@ -36,7 +36,7 @@ class Ray:
 
 class Material:
 
-    def __init__(self, k_d, k_s=0., p=20., k_m=0., k_a=None):
+    def __init__(self, k_d, k_s=0., p=20., k_m=0., k_a=None, opacity=1.0):
         """Create a new material with the given parameters.
 
         Parameters:
@@ -51,6 +51,7 @@ class Material:
         self.p = p
         self.k_m = k_m
         self.k_a = k_a if k_a is not None else k_d
+        self.opacity = opacity
 
 
 class Hit:
@@ -330,6 +331,7 @@ class Camera:
         d = normalize(self.u * (x * self.width/2.0) + self.v * (y * self.height/2.0) + self.w * self.f)
         return Ray(self.eye, d)
 
+MAX_DEPTH = 4
 
 class PointLight:
 
@@ -343,7 +345,7 @@ class PointLight:
         self.position = position
         self.intensity = intensity
 
-    def illuminate(self, ray, hit, scene):
+    def illuminate(self, ray, hit, scene, depth=0):
         """Compute the shading at a surface point due to this light.
 
         Parameters:
@@ -366,10 +368,26 @@ class PointLight:
         h = normalize(v+l)
         specular = material.k_s*(np.dot(n, h))**material.p
         specular_light = (material.k_d + specular)*irradiance/(r**2) * self.intensity
-        shadow_ray = Ray(hit.point + n * 1e-5, l)
 
+
+        if material.opacity < 1.0:
+            color = (1 - material.opacity) * specular_light + material.opacity * scene.bg_color
+
+            refraction_ray = Ray(hit.point + n * 1e-5, normalize(ray.direction))  # Ray continues in the same direction
+            new_scene = Scene(scene.surfs[1:], scene.bg_color)
+            refraction_hit = new_scene.intersect(refraction_ray)
+
+            if refraction_hit is not no_hit and depth <= MAX_DEPTH:
+                # If the refraction ray hits an object behind the transparent object, combine the colors
+                behind_color = self.illuminate(refraction_ray, refraction_hit, scene, depth+1)  # Recursive call for the hit object
+                color = (1 - material.opacity) * specular_light + material.opacity * behind_color
+        else:
+        # Fully opaque: just use the computed color
+            color = specular_light
+
+        shadow_ray = Ray(hit.point + n * 1e-5, l)
         if scene.intersect(shadow_ray) is no_hit:
-            return specular_light
+            return color
         else:
             return vec([0.0,0.0,0.0])
 
@@ -434,7 +452,7 @@ class Scene:
         return closest_hit
 
 
-MAX_DEPTH = 4
+
 
 def shade(ray, hit, scene, lights, depth=0):
     """Compute shading for a ray-surface intersection.
