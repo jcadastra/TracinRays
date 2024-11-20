@@ -246,3 +246,27 @@ def TransparencyExample():
     ]
     camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
     return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
+
+def SkyboxExample():
+    importlib.reload(ray)
+    right = Image.open('nightBox_right.jpg.jpg').convert("RGB")
+    left = Image.open('nightBox_left.jpg.jpg').convert("RGB")
+    up = Image.open('nightBox_up.jpg.jpg').convert("RGB")
+    down = Image.open('nightBox_down.jpg.jpg').convert("RGB")
+    forward = Image.open('nightBox_forward.jpg.jpg').convert("RGB")
+    back = Image.open('nightBox_back.jpg.jpg').convert("RGB")
+    skybox = ray.Skybox(right, left, up, down, forward, back)
+    tan = ray.Material(vec([0.7, 0.7, 0.4]), 0.6)
+    gray = ray.Material(vec([0.2, 0.2, 0.2]))
+
+    scene = ray.Scene([
+        ray.Sphere(vec([0, 0, 0]), 0.5, tan),
+        ray.Sphere(vec([0, -40, 0]), 39.5, gray),
+    ], skybox=skybox)
+
+    lights = [
+        ray.PointLight(vec([12, 10, 5]), vec([300, 300, 300])),
+        ray.AmbientLight(0.1),
+    ]
+    camera = ray.Camera(vec([3, 1.7, 5]), target=vec([0, 0, 0]), vfov=25, aspect=16 / 9)
+    return ExampleSceneDef(camera=camera, scene=scene, lights=lights);
