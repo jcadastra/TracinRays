@@ -31,12 +31,24 @@ class ExampleSceneDef(object):
 def Tower():
     importlib.reload(ray)
     normal_map = np.array(PILImage.open('water_normal.jpg').convert("RGB"))
-    tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6)
+    tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6, k_m = 0.4)
     tri = ray.Material(vec([151/255, 152/255, 144/255]), k_s=0.5, k_m=0.4, opacity=0.5)
     #gray = ray.Material(vec([0.2, 0.2, 0.2]))
     #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
     gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
-    blue = ray.Material(vec([181/255, 214/255, 219/255]))#, k_m=0.4)
+    blue = ray.Material(vec([181/255, 214/255, 219/255]), k_m=0.4)
+
+    moon_1 = ray.Sphere(vec([0.7, 2.0, 0.6]), 0.2, tri)
+    moon_2 = ray.Sphere(vec([0.65, 2.0, 0.65]), 0.15, tri)
+    moon = ray.Difference(moon_1, moon_2)
+    star_1 = ray.Sphere(vec([-2, 1.8, 0]), 0.05, tri)
+    star_2 = ray.Sphere(vec([-1.3, 2.1, 0]), 0.05, tri)
+    star_3 = ray.Sphere(vec([-0.8, 1.9, -0.5]), 0.05, tri)
+    star_4 = ray.Sphere(vec([1.3, 1.7, -0.8]), 0.06, tri)
+    star_5 = ray.Sphere(vec([-1.9, 1.5, -0.8]), 0.06, tri)
+    star_6 = ray.Sphere(vec([-1.1, 1.6, -0.8]), 0.06, tri)
+    star_7 = ray.Sphere(vec([1.6, 2.3, -0.8]), 0.06, tri)
+    star_8 = ray.Sphere(vec([1.9, 1.55, -0.8]), 0.06, tri)
 
     g1 = ray.Sphere(vec([0, -46.0010, 0.6]), 45, blue, normal_map=normal_map)
     g2 = ray.Sphere(vec([0, -45.5, 0.6]), 44.5, tan)
@@ -103,8 +115,17 @@ def Tower():
         # tiny_sphere2,
         #tower,
         biggest_sphere,
-        #main_scene
-    ], bg_color=vec([0,0,0]))
+        star_1,
+        star_2,
+        star_3,
+        star_4,
+        star_5,
+        star_6,
+        star_7,
+        star_8,
+        moon,
+        main_scene
+    ], bg_color=vec([65/255,69/255,80/255]))
 
     lights = [
         # ray.PointLight(vec([-12, 10, 5]), vec([300, 300, 300])),
