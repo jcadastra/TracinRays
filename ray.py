@@ -398,16 +398,14 @@ class PointLight:
         if material.opacity < 1.0:
             color = (1 - material.opacity) * specular_light + material.opacity * scene.bg_color
 
-            refraction_ray = Ray(hit.point + n * 1e-5, normalize(ray.direction))  # Ray continues in the same direction
+            refraction_ray = Ray(hit.point + n * 1e-5, normalize(ray.direction))
             new_scene = Scene(scene.surfs[1:], scene.bg_color)
             refraction_hit = new_scene.intersect(refraction_ray)
 
             if refraction_hit is not no_hit and depth <= MAX_DEPTH:
-                # If the refraction ray hits an object behind the transparent object, combine the colors
-                behind_color = self.illuminate(refraction_ray, refraction_hit, scene, depth+1)  # Recursive call for the hit object
+                behind_color = self.illuminate(refraction_ray, refraction_hit, scene, depth+1)
                 color = (1 - material.opacity) * specular_light + material.opacity * behind_color
         else:
-        # Fully opaque: just use the computed color
             color = specular_light
 
         shadow_ray = Ray(hit.point + n * 1e-5, l)
@@ -445,7 +443,7 @@ class AmbientLight:
 
 class Scene:
 
-    def __init__(self, surfs, bg_color=vec([0.2,0.3,0.5]), skybox = None):
+    def __init__(self, surfs, bg_color=vec([0.2,0.3,0.5])):
         """Create a scene containing the given objects.
 
         Parameters:
@@ -454,7 +452,6 @@ class Scene:
         """
         self.surfs = surfs
         self.bg_color = bg_color
-        self.skybox = skybox
 
     def intersect(self, ray):
         """Computes the first (smallest t) intersection between a ray and the scene.
@@ -500,7 +497,7 @@ def shade(ray, hit, scene, lights, depth=0):
     if depth > MAX_DEPTH:
         return vec([0.0,0.0,0.0])
     if hit is no_hit:
-        return scene.skybox.get_skybox_color(ray) if scene.skybox else scene.bg_color
+        return scene.bg_color
 
     for light in lights:
         direct += light.illuminate(ray, hit, scene)
@@ -604,88 +601,3 @@ class Difference:
             return no_hit
 
         return hit1
-
-class Skybox:
-
-    def __init__(self, right, left, up, down, forward, back):
-        """
-        Initialize the Skybox with textures for each face.
-
-        Parameters:
-        - right: Texture for the right face (positive X)
-        - left: Texture for the left face (negative X)
-        - up: Texture for the up face (positive Y)
-        - down: Texture for the down face (negative Y)
-        - forward: Texture for the forward face (positive Z)
-        - back: Texture for the back face (negative Z)
-        """
-        self.cube_map = {
-            'right': right,
-            'left': left,
-            'up': up,
-            'down': down,
-            'forward': forward,
-            'back': back
-        }
-
-    def get_skybox_color(self, ray):
-        """
-        Return the color from the skybox based on the ray's direction.
-
-        Parameters:
-          ray : Ray -- the ray that hit the surface
-
-        Returns:
-          (3,) -- the color seen along this ray
-        """
-
-        ray_direction = normalize(ray.direction)
-
-        if abs(ray_direction[0]) > abs(ray_direction[1]) and abs(ray_direction[0]) > abs(ray_direction[2]):
-            if ray_direction[0] > 0:
-                face = 'right'
-                u = -ray_direction[2]
-                v = ray_direction[1]
-            else:
-                face = 'left'
-                u = ray_direction[2]
-                v = ray_direction[1]
-        elif abs(ray_direction[1]) > abs(ray_direction[0]) and abs(ray_direction[1]) > abs(ray_direction[2]):
-            if ray_direction[1] > 0:
-                face = 'up'
-                u = ray_direction[0]
-                v = -ray_direction[2]
-            else:
-                face = 'down'
-                u = ray_direction[0]
-                v = ray_direction[2]
-        else:
-            if ray_direction[2] > 0:
-                face = 'forward'
-                u = ray_direction[0]
-                v = ray_direction[1]
-            else:
-                face = 'back'
-                u = -ray_direction[0]
-                v = ray_direction[1]
-
-        # Normalize texture coordinates to [0, 1]
-        u = (u + 1) / 2
-        v = (v + 1) / 2
-
-        # Ensure the coordinates are within bounds [0, 1]
-        u = np.clip(u, 0.0, 1.0)
-        v = np.clip(v, 0.0, 1.0)
-
-        # Get the texture for the selected face
-        texture = np.array(self.cube_map[face])
-
-        # Calculate texture coordinates
-        # tex_x = int(u * texture.shape[1])  # Width of texture
-        # tex_y = int(v * texture.shape[0])  # Height of texture
-        x, y = texture.shape[:2]
-        x = int(u*(y-1))
-        y = int(v*(x-1))
-
-        # Return the color from the texture at the calculated coordinates
-        return texture[y, x]

@@ -32,14 +32,16 @@ def Tower():
     importlib.reload(ray)
     normal_map = np.array(PILImage.open('water_normal.jpg').convert("RGB"))
     tan = ray.Material(vec([225/255, 204/255, 179/255]), 0.6, k_m = 0.4)
+    tan_1 = ray.Material(vec([225/255, 204/255, 179/255]), 0.6)
     tri = ray.Material(vec([151/255, 152/255, 144/255]), k_s=0.5, k_m=0.4, opacity=0.5)
+    tri_1 = ray.Material(vec([151 / 255, 152 / 255, 144 / 255]), k_s=0.5, k_m=0.4, opacity=0.5)
     #gray = ray.Material(vec([0.2, 0.2, 0.2]))
     #tan = ray.Material(vec([0.4, 0.4, 0.2]), k_s=0.3, p=90, k_m=0.3)
     gray = ray.Material(vec([0.2, 0.2, 0.2]), k_m=0.4)
-    blue = ray.Material(vec([181/255, 214/255, 219/255]), k_m=0.4)
+    blue = ray.Material(vec([55/255, 136/255, 170/255]), k_m=0.4)
 
     moon_1 = ray.Sphere(vec([0.7, 2.0, 0.6]), 0.2, tri)
-    moon_2 = ray.Sphere(vec([0.65, 2.0, 0.65]), 0.15, tri)
+    moon_2 = ray.Sphere(vec([0.65, 2.0, 0.65]), 0.16, tri)
     moon = ray.Difference(moon_1, moon_2)
     star_1 = ray.Sphere(vec([-2, 1.8, 0]), 0.05, tri)
     star_2 = ray.Sphere(vec([-1.3, 2.1, 0]), 0.05, tri)
@@ -65,7 +67,7 @@ def Tower():
     smaller_sphere = ray.Sphere(vec([0, 1.7, 0.6]), 0.1, tri)
     tiny_sphere1 = ray.Sphere(vec([0, 0.15, 0.6]), 0.07, tri)
     tiny_sphere2 = ray.Sphere(vec([0, 0.55, 0.6]), 0.07, tri)
-    biggest_sphere = ray.Difference(ray.Sphere(vec([1.5, -0.4, 2]), 0.8, tri), g2)
+    biggest_sphere = ray.Difference(ray.Sphere(vec([1.5, -0.4, 2]), 0.8, tri_1), g2)
 
     vs_list_1 = 0.4 * read_obj_triangles(open("rectangular_1.obj"))
     vs_list_2 = 0.3 * read_obj_triangles(open("rectangular_2.obj"))
@@ -100,7 +102,7 @@ def Tower():
     main_scene = ray.Union(main_scene, rec_3_union)
 
     scene = ray.Scene([
-        ground,
+        # ground,
         # c1,
         # c2,
         # c3,
@@ -115,6 +117,7 @@ def Tower():
         # tiny_sphere2,
         #tower,
         biggest_sphere,
+        #ray.Union(ground, rec_3_union)
         star_1,
         star_2,
         star_3,
@@ -125,7 +128,7 @@ def Tower():
         star_8,
         moon,
         main_scene
-    ], bg_color=vec([65/255,69/255,80/255]))
+    ], bg_color=vec([25/255,23/255,90/255]))
 
     lights = [
         # ray.PointLight(vec([-12, 10, 5]), vec([300, 300, 300])),
