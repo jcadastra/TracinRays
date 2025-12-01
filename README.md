@@ -1,4 +1,3 @@
-# A4-Intro-To-Graphics
-Ray Tracing!
-
-[Assignment docs](https://www.cs.cornell.edu/courses/cs4620/2024fa/assignments/docs/category/assignment-4)
+# Tracin' Rays
+This project recreates the Oriental Pearl Tower in a dream-core visual style using Constructive Solid Geometry (CSG) operations on 20+ primitive objects. The ray tracer supports perspective projection, a Blinn-Phong shading model, and recursive mirror reflections.
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/fcd440db-d2d0-4747-b609-fca85a797d54" />
